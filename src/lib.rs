@@ -35,7 +35,7 @@ pub fn retrieve_token() {
             });
 
             call_vault_login(&request_url, &payload);
-        }
+        },
         "userpass" | "ldap" => {
             let username = env::var("VAULT_USERNAME")
                 .expect("Cannot get environment variable VAULT_USERNAME");
@@ -47,6 +47,19 @@ pub fn retrieve_token() {
                 "password": password
             });
 
+            call_vault_login(&request_url, &payload);
+        },
+        "kubernetes" => {
+            let role = env::var("VAULT_ROLE_NAME")
+                .expect("Cannot get environment variable VAULT_ROLE_NAME");
+            let path = env::var("VAULT_K8S_AUTH_PATH")
+                .expect("Cannot get environment variable VAULT_K8S_AUTH_PATH");
+            let jwt = std::fs::read_to_string(path);
+
+            let payload = json!({
+                "role": role,
+                "jwt": jwt
+            });
             call_vault_login(&request_url, &payload);
         }
         _ => panic!("{} is not supported.", authentication_type)
