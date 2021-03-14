@@ -56,7 +56,8 @@ pub fn retrieve_token() {
             let role_name = env::var("VAULT_ROLE_NAME")
                 .expect("Cannot get environment variable VAULT_ROLE_NAME");
 
-            let jwt = fs::read_to_string(auth_path);
+            let jwt = fs::read_to_string(auth_path)
+                .expect("Cannot kubernetes auth file from path");
             let payload = json!({
                 "jwt": jwt,
                 "role": role_name
