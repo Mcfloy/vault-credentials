@@ -1,6 +1,7 @@
 use std::env;
 use serde_json::json;
 use reqwest;
+use std::fs;
 
 pub fn initialize() {
    retrieve_token();
@@ -35,7 +36,7 @@ pub fn retrieve_token() {
             });
 
             call_vault_login(&request_url, &payload);
-        }
+        },
         "userpass" | "ldap" => {
             let username = env::var("VAULT_USERNAME")
                 .expect("Cannot get environment variable VAULT_USERNAME");
@@ -48,7 +49,21 @@ pub fn retrieve_token() {
             });
 
             call_vault_login(&request_url, &payload);
-        }
+        },
+        "kubernetes" => {
+            let auth_path = env::var("VAULT_K8S_AUTH_PATH")
+                .expect("Cannot get environment variable VAULT_K8S_AUTH_PATH");
+            let role_name = env::var("VAULT_ROLE_NAME")
+                .expect("Cannot get environment variable VAULT_ROLE_NAME");
+
+            let jwt = fs::read_to_string(auth_path);
+            let payload = json!({
+                "jwt": jwt,
+                "role": role_name
+            });
+
+            call_vault_login(&request_url, &payload);
+        },
         _ => panic!("{} is not supported.", authentication_type)
     }
 }
