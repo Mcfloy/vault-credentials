@@ -4,6 +4,7 @@ description = "Rust Library that fetch secrets from Vault and load them as envir
 version = "0.1.0"
 authors = ["Lucas Perreau <lucas.perreau@leansys.fr>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 include = [
