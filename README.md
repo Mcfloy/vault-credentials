@@ -48,3 +48,7 @@ You can use other types of authentication by using `VAULT_TYPE`. (default is set
 |`approle`|`VAULT_ROLE_ID`,`VAULT_SECRET_ID`|
 |`kubernetes`|`VAULT_K8S_AUTH_PATH`,`VAULT_ROLE_NAME`|
 |`userpass`,`ldap` |`VAULT_USERNAME`, `VAULT_PASSWORD`|
+
+## Namespace
+If you use a namespace, you can define it using the environment variable `VAULT_NAMESPACE`.
+This will add a header in the requests.
