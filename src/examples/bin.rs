@@ -4,5 +4,5 @@ fn main() {
     dotenv().ok();
     vault_credentials::initialize();
 
-    println!("{}", std::env::var("github.com.api-key").unwrap());
+    println!("{}", std::env::var("app.mongo.uri").unwrap());
 }

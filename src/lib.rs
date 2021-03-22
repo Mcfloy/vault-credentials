@@ -73,8 +73,20 @@ fn retrieve_token() {
 }
 
 fn call_vault_login(request_url: &str, payload: &serde_json::Value) {
-    let response: serde_json::Value = reqwest::blocking::Client::new()
-        .post(request_url)
+    let vault_namespace_result = env::var("VAULT_NAMESPACE");
+
+    let mut request_builder = reqwest::blocking::Client::new()
+        .post(request_url);
+
+    if let Ok(vault_namespace) = vault_namespace_result {
+        request_builder = {
+            request_builder.header("X-Vault-Namespace", vault_namespace)
+        };
+    }
+
+    println!("{:?}", request_builder);
+
+    let response: serde_json::Value = request_builder
         .json(payload)
         .send()
         .unwrap()
@@ -82,7 +94,7 @@ fn call_vault_login(request_url: &str, payload: &serde_json::Value) {
         .unwrap();
 
     if let Some(errors) = response.get("errors") {
-        panic!("Cannot retrieve token: {}", errors.as_array().unwrap().first().unwrap());
+        panic!("Cannot retrieve token: {:?}", errors.as_array().unwrap());
     }
 
     let client_token = response
