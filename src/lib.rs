@@ -3,13 +3,16 @@ use serde_json::json;
 use reqwest;
 use std::fs;
 
+/// # Vault Credentials
+/// Rust Library that fetch secrets from Vault and load them as environment variables.
+/// Inspired by [Spring Cloud Vault](https://cloud.spring.io/spring-cloud-vault/reference/html/#vault.config.authentication).
+
 pub fn initialize() {
    retrieve_token();
-
    env_setter();
 }
 
-pub fn retrieve_token() {
+fn retrieve_token() {
     let vault_addr = env::var("VAULT_ADDR")
         .expect("Cannot get environment variable VAULT_ADDR");
 
@@ -70,8 +73,6 @@ pub fn retrieve_token() {
 }
 
 fn call_vault_login(request_url: &str, payload: &serde_json::Value) {
-    println!("Calling vault login {} with payload {:?}", request_url, payload);
-
     let response: serde_json::Value = reqwest::blocking::Client::new()
         .post(request_url)
         .json(payload)
@@ -90,7 +91,7 @@ fn call_vault_login(request_url: &str, payload: &serde_json::Value) {
     env::set_var("VAULT_TOKEN", client_token.as_str().unwrap());
 }
 
-pub fn env_setter() {
+fn env_setter() {
     let vault_addr = std::env::var("VAULT_ADDR").unwrap();
     let vault_token = std::env::var("VAULT_TOKEN").unwrap();
     let vault_path = std::env::var("VAULT_PATH").unwrap();
