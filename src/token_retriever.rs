@@ -7,7 +7,7 @@ use std::collections::HashMap;
 pub struct TokenRetriever {}
 
 impl TokenRetriever {
-    pub fn retrieve_token(vault_credentials: Credentials) -> String {
+    pub async fn retrieve_token(vault_credentials: Credentials) -> String {
         let authentication_type = match env::var("VAULT_TYPE") {
             Ok(value) => value,
             _ => String::from("token")
@@ -26,7 +26,7 @@ impl TokenRetriever {
                 .expect("Cannot get environment variable VAULT_TOKEN").as_str())
         } else {
             let payload = TokenRetriever::generate_payload(authentication_type.as_str());
-            TokenRetriever::call_vault_login(&request_url, Some(headers), &payload)
+            TokenRetriever::call_vault_login(&request_url, Some(headers), &payload).await
         }
     }
 
@@ -72,8 +72,8 @@ impl TokenRetriever {
         }
     }
 
-    fn call_vault_login(request_url: &str, headers_option: Option<HashMap<String, String>>, payload: &serde_json::Value) -> String {
-        let mut request_builder = reqwest::blocking::Client::new()
+    async fn call_vault_login(request_url: &str, headers_option: Option<HashMap<String, String>>, payload: &serde_json::Value) -> String {
+        let mut request_builder = reqwest::Client::new()
             .post(request_url);
 
         if let Some(headers) = headers_option {
@@ -87,8 +87,10 @@ impl TokenRetriever {
         let response: serde_json::Value = request_builder
             .json(payload)
             .send()
+            .await
             .unwrap()
             .json()
+            .await
             .unwrap();
 
         if let Some(errors) = response.get("errors") {

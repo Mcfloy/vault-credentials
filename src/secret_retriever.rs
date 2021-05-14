@@ -4,14 +4,14 @@ use std::env;
 pub struct SecretRetriever {}
 
 impl SecretRetriever {
-    pub fn env_setter(vault_credentials: Credentials, auth_token: String) {
+    pub async fn env_setter(vault_credentials: Credentials, auth_token: String) {
         let vault_path = std::env::var("VAULT_PATH").unwrap();
 
         let request_uri = {
             format!("{}/v1/secret/data/{}", String::from(vault_credentials.vault_addr), vault_path)
         };
 
-        let mut request_builder = reqwest::blocking::Client::new()
+        let mut request_builder = reqwest::Client::new()
             .get(&request_uri)
             .header("X-Vault-Token", auth_token);
 
@@ -22,8 +22,10 @@ impl SecretRetriever {
         }
 
         let response: serde_json::Value = request_builder.send()
+            .await
             .unwrap()
             .json()
+            .await
             .unwrap();
 
         if let Some(errors) = response.get("errors") {
