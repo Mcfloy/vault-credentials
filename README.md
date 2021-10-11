@@ -30,9 +30,10 @@ To use the vault_credentials crate in your program, import it and call the `init
 ```rust
 use dotenv::dotenv;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     dotenv().ok();
-    vault_credentials::initialize();
+    vault_credentials::initialize().await;
 
     println!("{}", std::env::var("github.com.api-key").unwrap());
     // Output: 123456
