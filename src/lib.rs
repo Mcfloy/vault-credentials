@@ -1,10 +1,8 @@
+use crate::credentials::Credentials;
+
 mod token_retriever;
 mod secret_retriever;
 mod credentials;
-
-use crate::credentials::Credentials;
-use crate::token_retriever::TokenRetriever;
-use crate::secret_retriever::SecretRetriever;
 
 /// Initialize the retrieving of the secrets to Vault.
 /// You must provide at least the three following environment variables:
@@ -37,7 +35,8 @@ use crate::secret_retriever::SecretRetriever;
 /// # Using kubernetes
 /// ```env
 /// VAULT_TYPE=kubernetes
-/// VAULT_K8S_AUTH_PATH=/path/to/k8s.json
+/// VAULT_K8S_AUTH_PATH?=kubernetes-id
+/// K8S_SERVICE_TOKEN=/path/to/k8s.json
 /// VAULT_ROLE_NAME=[...]
 /// ```
 /// # Using user pass
@@ -56,6 +55,6 @@ use crate::secret_retriever::SecretRetriever;
 /// You can specify a namespace using `VAULT_NAMESPACE` environment variable.
 pub async fn initialize() {
     let vault_credentials = Credentials::new();
-    let auth_token = TokenRetriever::retrieve_token(vault_credentials.clone()).await;
-    SecretRetriever::env_setter(vault_credentials, auth_token).await;
+    let auth_token = token_retriever::retrieve_token(vault_credentials.clone()).await;
+    secret_retriever::retrieve(vault_credentials, auth_token).await;
 }
