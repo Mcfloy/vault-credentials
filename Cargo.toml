@@ -1,7 +1,7 @@
 [package]
 name = "vault-credentials"
 description = "Rust Library that fetch secrets from Vault and load them as environment variables."
-version = "0.4.1"
+version = "1.0.0"
 authors = ["Lucas Perreau <lucas.perreau@leansys.fr>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
