@@ -1,6 +1,6 @@
 use std::env;
 use std::fs;
-use serde_json::json;
+use serde_json::{json};
 use crate::Credentials;
 use std::collections::HashMap;
 
@@ -71,13 +71,18 @@ fn generate_payload(authentication_type: &str) -> serde_json::Value {
                 })
         }
         "kubernetes" => {
-            let service_account_token = env::var("K8S_SERVICE_ACCOUNT_TOKEN")
+            let svc_path = env::var("K8S_SERVICE_ACCOUNT_TOKEN")
                 .unwrap_or(String::from("/var/run/secrets/kubernetes.io/serviceaccount/token"));
             let role_name = env::var("VAULT_ROLE_NAME")
                 .expect("Cannot get environment variable VAULT_ROLE_NAME");
 
-            let jwt = fs::read_to_string(service_account_token)
+            let svc_content = fs::read_to_string(svc_path)
                 .expect("Cannot kubernetes auth file from path");
+
+            let jwt = match serde_json::from_str::<serde_json::Value>(&svc_content) {
+                Ok(document) => String::from(document.get("token").unwrap().as_str().unwrap()),
+                _ => svc_content
+            };
 
             json!({
                     "jwt": jwt,

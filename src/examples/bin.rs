@@ -5,5 +5,5 @@ async fn main() {
     dotenv().ok();
     vault_credentials::initialize().await;
 
-    println!("{}", std::env::var("app.mongo.uri").unwrap());
+    println!("{}", std::env::var("mongo.url").unwrap());
 }
