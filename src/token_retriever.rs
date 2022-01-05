@@ -72,7 +72,7 @@ fn generate_payload(authentication_type: &str) -> serde_json::Value {
         }
         "kubernetes" => {
             let service_account_token = env::var("K8S_SERVICE_ACCOUNT_TOKEN")
-                .unwrap_or(String::from("/var/run/secrets/kubernetes.io/serviceaccount"));
+                .unwrap_or(String::from("/var/run/secrets/kubernetes.io/serviceaccount/token"));
             let role_name = env::var("VAULT_ROLE_NAME")
                 .expect("Cannot get environment variable VAULT_ROLE_NAME");
 
